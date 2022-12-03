@@ -10,5 +10,5 @@ fn main() {
 
     elves.sort_by(|a, b| b.cmp(a));
     println!("Best elf: {}", elves[0]);
-    println!("Best three: {}", elves[0..3].into_iter().sum::<u32>());
+    println!("Best three: {}", elves[0..3].iter().sum::<u32>());
 }
