@@ -23,6 +23,9 @@ path = "src/day3.rs"
 name = "day4"
 path = "src/day4.rs"
 
+[dependencies]
+sscanf = "0.4.0"
+
 # [[bin]]
 # name = "day5"
 # path = "src/day5.rs"
