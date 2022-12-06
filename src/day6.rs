@@ -23,5 +23,4 @@ fn main() {
             range.1 = idx+1;
         }
     }
-
 }
