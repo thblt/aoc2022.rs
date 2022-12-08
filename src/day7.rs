@@ -18,11 +18,10 @@ fn main() {
                     stack.push(cd.to_string());
                 }
             }
-        } else if let Ok(_) = sscanf!(&line, "dir {str}") {
-            let repr = stack.join("/");
-            if !dirs.contains_key(&repr) {
-                dirs.insert(repr, 0);
-            }
+            // } else if let Ok(dir) = sscanf!(&line, "dir {str}") {
+            // stack.push(dir.to_string());
+            // let repr = stack.join("/");
+            // dirs.entry(repr).or_insert(0);
         } else if let Ok((size, _)) = sscanf!(&line, "{u32} {str}") {
             available -= size;
             for i in 0..=stack.len() {
