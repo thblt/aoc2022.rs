@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io;
 use std::io::BufRead;
 use std::path::Path;
+use std::ops::Sub;
 
 pub mod matrix;
 
@@ -37,4 +38,10 @@ pub fn read_digit(c: char) -> u8 {
         'F' => 15,
         _ => panic!("Bad input"),
     }
+}
+
+
+pub fn abs_diff<T: Copy + Ord + Sub>(a: T, b: T) -> <T as Sub>::Output  {
+    use std::cmp::{min,max};
+    max(a, b) - min (a, b)
 }
