@@ -29,10 +29,8 @@ fn scenic_score(trees: &Matrix<i8>, x: isize, y: isize) -> u64 {
             break;
         }
     }
-
     counts.0 * counts.1 * counts.2 * counts.3
 }
-
 
 fn part2() {
     let trees = read_forest();
