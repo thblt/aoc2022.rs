@@ -59,9 +59,12 @@ impl CommandStream {
             stream: cs.to_vec(),
         }
     }
+}
 
-    // @FIXME Make a clean iterator.
-    fn next(&mut self) -> Option<Dir> {
+impl Iterator for CommandStream {
+    type Item = Dir;
+
+    fn next(&mut self) -> Option<Self::Item> {
         if self.rem > 0 {
             self.rem -= 1;
             Some(self.stream[self.idx].0)
@@ -77,15 +80,11 @@ impl CommandStream {
 
 type Coord = (i32, i32);
 
-struct Rope {
-    knots: Vec<Coord>,
-}
+struct Rope (Vec<Coord>);
 
 impl Rope {
     fn new(knots: usize) -> Rope {
-        Rope {
-            knots: vec![(0, 0); knots],
-        }
+        Rope(vec![(0, 0); knots])
     }
 
     fn get_closer(head: i32, tail: i32) -> i32 {
@@ -93,45 +92,40 @@ impl Rope {
     }
 
     fn apply(&mut self, dir: Dir) {
+        use Dir::*;
         match dir {
-            Dir::Right => self.knots[0].0 += 1,
-            Dir::Up => self.knots[0].1 += 1,
-            Dir::Left => self.knots[0].0 -= 1,
-            Dir::Down => self.knots[0].1 -= 1,
+            Right => self.0[0].0 += 1,
+            Up => self.0[0].1 += 1,
+            Left => self.0[0].0 -= 1,
+            Down => self.0[0].1 -= 1,
         }
 
-        for k in 1..self.knots.len() {
-            if abs_diff(self.knots[k - 1].0, self.knots[k].0) <= 1
-                && abs_diff(self.knots[k - 1].1, self.knots[k].1) <= 1
+        for k in 1..self.0.len() {
+            if abs_diff(self.0[k - 1].0, self.0[k].0) <= 1
+                && abs_diff(self.0[k - 1].1, self.0[k].1) <= 1
             {
                 return;
             }
-            if self.knots[k - 1].0 != self.knots[k].0 {
-                self.knots[k].0 = Rope::get_closer(self.knots[k - 1].0, self.knots[k].0);
+            if self.0[k - 1].0 != self.0[k].0 {
+                self.0[k].0 = Rope::get_closer(self.0[k - 1].0, self.0[k].0);
             }
-            if self.knots[k - 1].1 != self.knots[k].1 {
-                self.knots[k].1 = Rope::get_closer(self.knots[k - 1].1, self.knots[k].1);
+            if self.0[k - 1].1 != self.0[k].1 {
+                self.0[k].1 = Rope::get_closer(self.0[k - 1].1, self.0[k].1);
             }
         }
     }
 }
 
 fn main() {
-    let mut cmds = read_input();
     let mut rope2 = Rope::new(2);
     let mut rope10 = Rope::new(10);
     let mut coords2: HashSet<Coord> = HashSet::new();
     let mut coords10: HashSet<Coord> = HashSet::new();
-    loop {
-        if let Some(dir) = cmds.next() {
-            rope2.apply(dir);
-            coords2.insert(rope2.knots[rope2.knots.len()-1]);
-            rope10.apply(dir);
-            coords10.insert(rope10.knots[rope10.knots.len()-1]);
-
-        } else {
-            break;
-    }
+    for dir in read_input() {
+        rope2.apply(dir);
+        rope10.apply(dir);
+        coords2.insert(*rope2.0.last().unwrap());
+        coords10.insert(*rope10.0.last().unwrap());
     }
     println!("Part 1: {}", coords2.len());
     println!("Part 2: {}", coords10.len());
