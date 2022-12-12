@@ -7,7 +7,7 @@ type Item = u64;
 type Level = u64;
 type Monkeys = Vec<Monkey>;
 
-#[derive(Debug,PartialEq,Eq,Copy,Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 enum Op {
     Add,
     Mul,
@@ -26,19 +26,19 @@ impl FromStr for Op {
     }
 }
 
-#[derive(PartialEq,Eq,Clone,Debug)]
+#[derive(PartialEq, Eq, Clone, Debug)]
 struct Monkey {
     items: Vec<Item>,
     op: Op,
     op_constant: Level,
     div_test: Level,
-    throw_to: (MonkeyId,MonkeyId),
+    throw_to: (MonkeyId, MonkeyId),
     counter: u64,
 }
 
 fn read_input(path: &str) -> Monkeys {
     let mut lines = read_lines(path).map(|l| l.unwrap());
-    let mut monkeys:Monkeys = Monkeys::new();
+    let mut monkeys: Monkeys = Monkeys::new();
     loop {
         let _line = lines.next().unwrap();
         // let id = sscanf!(line, "Monkey {MonkeyId}:").unwrap();
@@ -47,7 +47,7 @@ fn read_input(path: &str) -> Monkeys {
         let items = sscanf!(line, "  Starting items: {String}").unwrap();
 
         let line = lines.next().unwrap();
-        let (op,c) =  sscanf!(line, "  Operation: new = old {String} {String}").unwrap();
+        let (op, c) = sscanf!(line, "  Operation: new = old {String} {String}").unwrap();
         let mut op = op.parse::<Op>().unwrap();
 
         let op_constant: Level;
@@ -65,11 +65,15 @@ fn read_input(path: &str) -> Monkeys {
         let line2 = lines.next().unwrap();
         let throw_to = (
             sscanf!(line1, "    If true: throw to monkey {MonkeyId}").unwrap(),
-            sscanf!(line2, "    If false: throw to monkey {MonkeyId}").unwrap());
+            sscanf!(line2, "    If false: throw to monkey {MonkeyId}").unwrap(),
+        );
 
         let monkey = Monkey {
             // id,
-            items: items.split(", ").map(|c| c.parse::<Item>().unwrap()).collect::<Vec<Item>>(),
+            items: items
+                .split(", ")
+                .map(|c| c.parse::<Item>().unwrap())
+                .collect::<Vec<Item>>(),
             op,
             op_constant,
             div_test,
@@ -87,7 +91,7 @@ fn read_input(path: &str) -> Monkeys {
 
 fn main() {
     let mut monkeys = read_input("inputs/11.txt");
-    let mut throws: Vec<Vec<Item>> = monkeys.iter().map(|_| vec!()).collect();
+    let mut throws: Vec<Vec<Item>> = monkeys.iter().map(|_| vec![]).collect();
 
     let divs: u64 = monkeys.iter().map(|m| m.div_test).product();
 
@@ -109,15 +113,25 @@ fn main() {
 
                 level = level % divs;
 
-                throws[if level % monkey.div_test == 0 { monkey.throw_to.0 } else { monkey.throw_to.1}].push(level);
+                throws[if level % monkey.div_test == 0 {
+                    monkey.throw_to.0
+                } else {
+                    monkey.throw_to.1
+                }]
+                    .push(level);
             }
         }
     }
     let mut counts = monkeys.iter().map(|m| m.counter).collect::<Vec<u64>>();
-    counts.sort_by(|a,b| b.cmp(a));
+    counts.sort_by(|a, b| b.cmp(a));
     println!("Part 1: see comment in code.");
     // TO RESTORE PART 1:
     //  - Bring loop back to 20 iterations.
     //  - Restore `level /= 3`;
-    println!("Part 2: {}×{}={}", counts[0], counts[1], counts[0]*counts[1]);
+    println!(
+        "Part 2: {}×{}={}",
+        counts[0],
+        counts[1],
+        counts[0] * counts[1]
+    );
 }
