@@ -3,8 +3,8 @@ use sscanf::sscanf;
 use std::str::FromStr;
 
 type MonkeyId = usize;
-type Item = u128;
-type Level = u128;
+type Item = u64;
+type Level = u64;
 type Monkeys = Vec<Monkey>;
 
 #[derive(Debug,PartialEq,Eq,Copy,Clone)]
@@ -33,7 +33,7 @@ struct Monkey {
     op_constant: Level,
     div_test: Level,
     throw_to: (MonkeyId,MonkeyId),
-    counter: u128,
+    counter: u64,
 }
 
 fn read_input(path: &str) -> Monkeys {
@@ -89,7 +89,7 @@ fn main() {
     let mut monkeys = read_input("inputs/11.txt");
     let mut throws: Vec<Vec<Item>> = monkeys.iter().map(|_| vec!()).collect();
 
-    let divs: u128 = monkeys.iter().map(|m| m.div_test).product();
+    let divs: u64 = monkeys.iter().map(|m| m.div_test).product();
 
     for _ in 0..10000 {
         for (id, monkey) in monkeys.iter_mut().enumerate() {
@@ -104,25 +104,20 @@ fn main() {
                     Op::Pow => object.pow(monkey.op_constant as u32),
                 };
 
-                // Simplification trick
-                let level = level % divs;
-
-                // println!("  Worry level is now {}", level);
-                // TO RESTORE PART 1:
-                // The monkey didn't break anything, worry level divides by 3.
+                // PART 1:
                 // level /= 3;
-                if level % monkey.div_test == 0 {
-                    // println!("  {} throws it to {}", id, monkey.throw_to.0);
-                    throws[monkey.throw_to.0].push(level);
-                    } else
-                    {
-                        // println!("  {} throws it to {}", id, monkey.throw_to.1);
-                    throws[monkey.throw_to.1].push(level);
-               }
+
+                level = level % divs;
+
+                throws[if level % monkey.div_test == 0 { monkey.throw_to.0 } else { monkey.throw_to.1}].push(level);
             }
         }
     }
-    let mut counts = monkeys.iter().map(|m| m.counter).collect::<Vec<u128>>();
+    let mut counts = monkeys.iter().map(|m| m.counter).collect::<Vec<u64>>();
     counts.sort_by(|a,b| b.cmp(a));
+    println!("Part 1: see comment in code.");
+    // TO RESTORE PART 1:
+    //  - Bring loop back to 20 iterations.
+    //  - Restore `level /= 3`;
     println!("Part 2: {}×{}={}", counts[0], counts[1], counts[0]*counts[1]);
 }
