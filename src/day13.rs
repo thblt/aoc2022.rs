@@ -1,4 +1,5 @@
 use lib::*;
+use std::cmp::Ordering;
 use std::fmt::Debug;
 
 type Int = i64;
@@ -188,23 +189,18 @@ impl Parser {
 
 // * Problem
 
-enum ComparisonResult {
-    Valid,
-    Invalid,
-    Undecided,
-}
-
-fn compare(left: &Atom, right: &Atom, depth: usize) -> Option<bool> {
+fn compare(left: &Atom, right: &Atom) -> Ordering {
     // Case 1: two integers.
     // println!("{} - Compare: {:?} with {:?}", " ".repeat(depth*2), left, right);
+    use Ordering::*;
     if left.is_integer() && right.is_integer() {
         if left.as_integer() < right.as_integer() {
-            return Some(true);
+            return Less;
         } else if left.as_integer() > right.as_integer() {
-            return Some(false);
+            return Greater;
         } else {
-            return None;
-        };
+            return Equal;
+        }
         // Case 2: two lists
     } else if left.is_list() && right.is_list() {
         let mut left = left.as_list().unwrap().iter();
@@ -213,46 +209,71 @@ fn compare(left: &Atom, right: &Atom, depth: usize) -> Option<bool> {
             let l = left.next();
             let r = right.next();
             if l.is_none() && r.is_some() {
-                return Some(true);
+                return Less;
             } else if l.is_some() && r.is_none() {
-                return Some(false);
+                return Greater;
             } else if l.is_none() && r.is_none() {
                 break;
             } else {
-                let ret = compare(l.unwrap(), r.unwrap(),depth+1);
-                if ret.is_some() { return ret; }
-
+                let ret = compare(l.unwrap(), r.unwrap());
+                if ret != Equal {
+                    return ret;
+                }
             }
         }
         // Case 3 and 3’: list and integer.
     } else if left.is_integer() {
-        let ret = compare(&Atom::List(vec![Box::new(left.clone())]), right,depth+1);
-        if ret.is_some() { return ret; }
+        let ret = compare(&Atom::List(vec![Box::new(left.clone())]), right);
+        if ret != Equal {
+            return ret;
+        }
     } else if right.is_integer() {
-        let ret = compare(left, &Atom::List(vec![Box::new(right.clone())]),depth+1);
-        if ret.is_some() { return ret; }
+        let ret = compare(left, &Atom::List(vec![Box::new(right.clone())]));
+        if ret != Equal {
+            return ret;
+        }
     } else {
         unreachable!();
     }
-    None
+    Equal
 }
 
 fn main() {
     let mut input = read_lines("inputs/13.txt");
     let mut index = 0;
     let mut sum = 0;
+
+    let dp1 = Parser::parse("[[2]]");
+    let dp2 = Parser::parse("[[6]]");
+
+    let mut all: Vec<Atom> = vec![dp1.clone(),dp2.clone()];
     loop {
         let left = Parser::parse(&input.next().unwrap().unwrap());
         let right = Parser::parse(&input.next().unwrap().unwrap());
+
+        // Collect for part 2
+        all.push(left.clone());
+        all.push(right.clone());
+
         index += 1;
-        // println!("{:?}", left);
-        // println!("{:?}", right);
-        if compare(&left, &right, 0) == Some(true) {
-            sum += index;
+         if compare(&left, &right) == Ordering::Less {
+             sum += index;
+        }
+        if input.next().is_none() {
+            break;
+        }
     }
-    if input.next().is_none() {
-        break;
+    println!("Part 1: {}", sum);
+
+    all.sort_by(|a,b| compare(a,b));
+    let mut product = 1;
+    for (i, item) in all.iter().enumerate() {
+        // println!("{:3} {:?}", i, item);
+        if *item == dp1 || *item == dp2 {
+            // println!(" [DIVIDER 1]")
+            product *= i+1;
+        }
     }
-    }
-    println!("Sum: {}", sum);
+    println!("Decoder key: {}", product);
+
 }
