@@ -30,7 +30,7 @@ fn part2() {
             collector.clear();
         }
     }
-    println!("Part 2: {}", total);
+    println!("Part 2: {total}");
 }
 
 fn part1() {
@@ -50,7 +50,7 @@ fn part1() {
             total += priority(*c);
         }
     }
-    println!("Part 1: {}", total);
+    println!("Part 1: {total}");
 }
 
 fn main() {

@@ -68,9 +68,9 @@ fn part1() {
     let dim = (trees.width() - 1) as isize;
         let mut visible: HashSet<(isize, isize)> = HashSet::new();
 
-        for a in 0..=dim as isize {
+        for a in 0..=dim {
             let mut thresholds = (-1, -1, -1, -1);
-            for b in 0..=dim as isize {
+            for b in 0..=dim {
                 // Left -> right
                 if trees[(a, b)] > thresholds.0 {
                     visible.insert((a, b));

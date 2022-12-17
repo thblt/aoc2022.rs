@@ -12,8 +12,7 @@ struct Cave {
     floor: isize,
 }
 
-
-#[derive(Eq, PartialEq, PartialOrd, Ord, Copy, Clone,Debug)]
+#[derive(Eq, PartialEq, PartialOrd, Ord, Copy, Clone, Debug)]
 enum Element {
     Sand,
     Air,
@@ -22,12 +21,15 @@ enum Element {
 
 impl Display for Element {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}",
-               match self {
-                   Element::Sand => "o",
-                   Element::Air => ".",
-                   Element::Rock => "#",
-               })
+        write!(
+            f,
+            "{}",
+            match self {
+                Element::Sand => "o",
+                Element::Air => ".",
+                Element::Rock => "#",
+            }
+        )
     }
 }
 
@@ -41,22 +43,21 @@ fn read_input(path: &str) -> Cave {
         for pair in line.split(" -> ") {
             let end: Coord = sscanf!(pair, "{isize},{isize}").unwrap();
             // Update floor
-            if end.1 > floor-2 {
+            if end.1 > floor - 2 {
                 floor = end.1 + 2;
             }
 
-            if start.is_some() {
-                let start = start.unwrap();
+            if let Some(start) = start {
                 let constant;
                 let range;
                 let swap;
                 if start.0 == end.0 {
                     constant = start.0;
-                    range = std::cmp::min(start.1, end.1)..std::cmp::max(start.1, end.1)+1;
+                    range = std::cmp::min(start.1, end.1)..std::cmp::max(start.1, end.1) + 1;
                     swap = false;
                 } else if start.1 == end.1 {
                     constant = start.1;
-                    range = std::cmp::min(start.0, end.0)..std::cmp::max(start.0, end.0)+1;
+                    range = std::cmp::min(start.0, end.0)..std::cmp::max(start.0, end.0) + 1;
                     swap = true;
                 } else {
                     panic!("Bad input");
@@ -64,9 +65,9 @@ fn read_input(path: &str) -> Cave {
 
                 for var in range {
                     if swap {
-                        cave[(var,constant)] = Element::Rock;
+                        cave[(var, constant)] = Element::Rock;
                     } else {
-                        cave[(constant,var)] = Element::Rock;
+                        cave[(constant, var)] = Element::Rock;
                     }
                 }
             }
@@ -77,15 +78,18 @@ fn read_input(path: &str) -> Cave {
     Cave { cave, floor }
 }
 
-fn add_sand(cave: &mut Cave) -> bool{
-    let mut pos: Coord = (500,0);
+fn add_sand(cave: &mut Cave) -> bool {
+    let mut pos: Coord = (500, 0);
     if cave.cave[pos] != Element::Air {
         return false;
     }
 
     'outer: loop {
-        for cand in [(pos.0, pos.1 + 1),(pos.0-1, pos.1 + 1),(pos.0+1, pos.1 + 1)]
-        {
+        for cand in [
+            (pos.0, pos.1 + 1),
+            (pos.0 - 1, pos.1 + 1),
+            (pos.0 + 1, pos.1 + 1),
+        ] {
             if cand.1 < cave.floor && cave.cave.get(cand.0, cand.1) == Some(Element::Air) {
                 pos = cand;
                 continue 'outer;
