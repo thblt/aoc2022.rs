@@ -33,7 +33,7 @@ impl Tokenizer {
                 '[' => state.open(),
                 ']' => state.close(),
                 ',' => state.delim(),
-                c if c.is_digit(10) => state.read_digit(read_digit(c)),
+                c if c.is_ascii_digit() => state.read_digit(read_digit(c)),
                 _ => panic!("Invalid input."),
             }
         }
@@ -75,11 +75,11 @@ impl Tokenizer {
 #[derive(Eq, PartialEq, PartialOrd, Ord, Clone)]
 enum Atom {
     Integer(Int),
-    List(Vec<Box<Atom>>),
+    List(Vec<Atom>),
 }
 
 impl Atom {
-    fn as_list(&self) -> Option<&Vec<Box<Atom>>> {
+    fn as_list(&self) -> Option<&Vec<Atom>> {
         if let Self::List(v) = self {
             Some(v)
         } else {
@@ -140,7 +140,7 @@ impl Parser {
     fn close(&mut self) {
         let list = self.stack.pop().unwrap();
         if let Some(Atom::List(l)) = self.stack.last_mut() {
-            l.push(Box::new(list));
+            l.push(list);
         } else {
             panic!("Abnormal input (unexpected end of list)");
         }
@@ -149,7 +149,7 @@ impl Parser {
     fn integer(&mut self, int: Int) {
         let parent = self.stack.last_mut().unwrap();
         if let Atom::List(l) = parent {
-            l.push(Box::new(Atom::Integer(int)));
+            l.push(Atom::Integer(int));
         } else {
             panic!("Abnormal state (no list to store that integer)");
         }
@@ -175,7 +175,7 @@ impl Parser {
         // The following input parses: "17,3"
         // but isn't representable, and should fail.
         // Either return before end of token list (on state.clese()) or crash politely.
-        *state
+        state
             .stack
             .last()
             .unwrap()
@@ -194,13 +194,7 @@ fn compare(left: &Atom, right: &Atom) -> Ordering {
     // println!("{} - Compare: {:?} with {:?}", " ".repeat(depth*2), left, right);
     use Ordering::*;
     if left.is_integer() && right.is_integer() {
-        if left.as_integer() < right.as_integer() {
-            return Less;
-        } else if left.as_integer() > right.as_integer() {
-            return Greater;
-        } else {
-            return Equal;
-        }
+        return left.as_integer().cmp(&right.as_integer())
         // Case 2: two lists
     } else if left.is_list() && right.is_list() {
         let mut left = left.as_list().unwrap().iter();
@@ -223,12 +217,12 @@ fn compare(left: &Atom, right: &Atom) -> Ordering {
         }
         // Case 3 and 3’: list and integer.
     } else if left.is_integer() {
-        let ret = compare(&Atom::List(vec![Box::new(left.clone())]), right);
+        let ret = compare(&Atom::List(vec![left.clone()]), right);
         if ret != Equal {
             return ret;
         }
     } else if right.is_integer() {
-        let ret = compare(left, &Atom::List(vec![Box::new(right.clone())]));
+        let ret = compare(left, &Atom::List(vec![right.clone()]));
         if ret != Equal {
             return ret;
         }
@@ -265,15 +259,12 @@ fn main() {
     }
     println!("Part 1: {}", sum);
 
-    all.sort_by(|a,b| compare(a,b));
+    all.sort_by(compare);
     let mut product = 1;
     for (i, item) in all.iter().enumerate() {
-        // println!("{:3} {:?}", i, item);
         if *item == dp1 || *item == dp2 {
-            // println!(" [DIVIDER 1]")
             product *= i+1;
         }
     }
     println!("Decoder key: {}", product);
-
 }

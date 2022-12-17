@@ -111,7 +111,7 @@ fn main() {
                 // PART 1:
                 // level /= 3;
 
-                level = level % divs;
+                level %= divs;
 
                 throws[if level % monkey.div_test == 0 {
                     monkey.throw_to.0
