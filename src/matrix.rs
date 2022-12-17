@@ -99,14 +99,15 @@ impl<T: Copy> Matrix<T> {
     }
 
     pub fn draw_with(&self, func: &dyn Fn(&T) -> String) {
+        let mut repr = String::new();
         for i in 0..self.vec.len() {
             if i % self.width == 0 {
-                println!();
+                repr += "\n";
             }
             let val = self.vec[i];
-            print!("{}", func(&val));
+            repr += &func(&val);
         }
-        println!();
+        println!("{repr}");
     }
 }
 
