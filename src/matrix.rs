@@ -1,4 +1,7 @@
-use std::ops::{Index, IndexMut};
+use std::{
+    fmt::Display,
+    ops::{Index, IndexMut},
+};
 
 #[derive(Clone)]
 pub struct Matrix<T> {
@@ -118,6 +121,18 @@ impl<T> IndexMut<(isize, isize)> for Matrix<T> {
     fn index_mut(&mut self, coords: (isize, isize)) -> &mut Self::Output {
         let i = self.to_index(coords);
         &mut self.vec[i]
+    }
+}
+
+impl<T: Display> Display for Matrix<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        for i in 0..self.vec.capacity() {
+            if i % self.width == 0 {
+                write!(f, "\n")?
+            }
+            self.vec[i].fmt(f)?;
+        }
+        Ok(())
     }
 }
 
