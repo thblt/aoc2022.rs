@@ -12,6 +12,10 @@ pub struct Matrix<T> {
 
 impl<T> Matrix<T> {
     pub fn to_index(&self, (x, y): (isize, isize)) -> usize {
+        if !self.test_coords(x, y) {
+            panic!("Bad coords: {x},{y}");
+        }
+
         let x = x as usize;
         let y = y as usize;
 
@@ -27,6 +31,9 @@ impl<T> Matrix<T> {
     }
 
     pub fn to_coords(&self, idx: usize) -> (isize, isize) {
+        if !idx < self.vec.len() {
+            panic!("Out of bounds");
+        }
         let x = (idx % self.width) as isize;
         let y = (idx / self.width) as isize;
         (x, y)
@@ -128,7 +135,7 @@ impl<T: Display> Display for Matrix<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         for i in 0..self.vec.capacity() {
             if i % self.width == 0 {
-                write!(f, "\n")?
+                writeln!(f)?
             }
             self.vec[i].fmt(f)?;
         }
