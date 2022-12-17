@@ -114,7 +114,7 @@ fn main() {
     let mut shapes = make_shapes();
     let mut chamber: Chamber = Chamber::new(4000);
 
-    for i in 1..=2022 {
+    for _ in 1..=2022 {
         // Shapes
         let shape = shapes.next().unwrap();
         let mut x: isize = 2;
@@ -122,7 +122,7 @@ fn main() {
         loop {
             // Descent
             let jet = jets.next().unwrap();
-            let new_x: isize = x as isize + jet;
+            let new_x: isize = x + jet;
             if new_x >= 0 && chamber.can_fit(&shape, new_x as usize, y) {
                 x = new_x;
             }
