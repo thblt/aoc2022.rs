@@ -1,12 +1,24 @@
+// For future optimization:
+//
+// `break_geodes` need to hold state with the geodes count of the best
+// solution it's found.  We prune paths that cannot be better than the
+// best even if they produced a geode robot a minute until the end of
+// time.
+//
+//  - depth first with some heuristics.  Possible first try:
+//    * The max geode robots the better.
+//    * If no geode robots, the max obsidian robots first.
+//    * or: when will we get the first geode/geode bot/obsidian bot.
+
 use lib::*;
 use sscanf::sscanf;
-use std::{collections::HashSet, fmt::Debug};
+use std::fmt::Debug;
 
 type Ore = usize;
 type Clay = usize;
 type Obsidian = usize;
 
-type Futures = HashSet<Factory>;
+type Futures = Vec<Factory>;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Log {
@@ -84,7 +96,7 @@ impl Factory {
             new.exclusions.no_clay_robot |= clay_p;
             new.exclusions.no_obsidian_robot |= obsidian_p;
             new.exclusions.no_geode_robot |= geode_p;
-            ret.insert(new);
+            ret.push(new);
         }
 
         // Then we create as many new factories as we can, each
@@ -96,14 +108,14 @@ impl Factory {
             new.ore_store -= blueprint.ore_cost;
             new.ore_robots += 1;
             new.exclusions = Exclusions::default();
-            ret.insert(new);
+            ret.push(new);
         }
         if clay_p && !self.exclusions.no_clay_robot {
             let mut new = self.clone();
             new.ore_store -= blueprint.clay_cost;
             new.clay_robots += 1;
             new.exclusions = Exclusions::default();
-            ret.insert(new);
+            ret.push(new);
         }
         if obsidian_p && !self.exclusions.no_obsidian_robot {
             let mut new = self.clone();
@@ -111,7 +123,7 @@ impl Factory {
             new.clay_store -= blueprint.obsidian_cost.1;
             new.obsidian_robots += 1;
             new.exclusions = Exclusions::default();
-            ret.insert(new);
+            ret.push(new);
         }
         if geode_p && !self.exclusions.no_geode_robot {
             let mut new = self.clone();
@@ -119,7 +131,7 @@ impl Factory {
             new.obsidian_store -= blueprint.geode_cost.1;
             new.geode_robots += 1;
             new.exclusions = Exclusions::default();
-            ret.insert(new);
+            ret.push(new);
         }
         ret
     }
@@ -143,7 +155,7 @@ impl Factory {
                 f.geodes += new_geodes;
                 f
             })
-            .collect::<HashSet<Factory>>();
+            .collect::<Futures>();
         futures
     }
 
@@ -159,7 +171,7 @@ impl Factory {
         let mut best: Option<Log> = None;
 
         let mut futures = self.make_future_states(blueprint);
-        for f in futures.drain() {
+        for f in futures.drain(0..) {
             let log = f.break_geodes(blueprint, time - 1);
             if let Some(mut log) = log {
                 if log.geodes > max {
@@ -218,10 +230,10 @@ fn read_input(s: &str) -> Vec<Blueprint> {
     ret
 }
 
-fn main() {
+fn part1() {
     let time = 24;
     let mut result = 0;
-    for blueprint in read_input("inputs/19.txt").into_iter().skip(1) {
+    for blueprint in read_input("inputs/19.txt").into_iter() {
         println!("Blueprint {0}", blueprint.id);
         if let Some(score) = Factory::new().break_geodes(&blueprint, time) {
             println!(" - Geodes: {:?}", score.geodes);
@@ -230,9 +242,31 @@ fn main() {
                 println!("{:2} {:?}", time - minute, state);
             }
         } else {
-            println!(" - NOTHING");
+            println!(" - Geodes: 0");
         }
-
     }
     println!("Result: {}", result);
+}
+
+fn part2() {
+    let time = 31;
+    let mut result = 0;
+    for blueprint in read_input("inputs/19-short.txt").into_iter().take(3) {
+        println!("Blueprint {0}", blueprint.id);
+        if let Some(score) = Factory::new().break_geodes(&blueprint, time) {
+            println!(" - Geodes: {:?}", score.geodes);
+            result *= score.geodes;
+            for (minute, state) in score.history.into_iter().enumerate() {
+                println!("{:2} {:?}", time - minute, state);
+            }
+        } else {
+            println!(" - Geodes: 0");
+        }
+    }
+    println!("Result: {}", result);
+}
+
+fn main() {
+    part1();
+    // part2();
 }
