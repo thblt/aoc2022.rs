@@ -54,9 +54,9 @@ path = "src/day10.rs"
 name = "day11"
 path = "src/day11.rs"
 
-# [[bin]]
-# name = "day12"
-# path = "src/day12.rs"
+[[bin]]
+name = "day12"
+path = "src/day12.rs"
 
 [[bin]]
 name = "day13"
@@ -86,13 +86,13 @@ path = "src/day18.rs"
 name = "day19"
 path = "src/day19.rs"
 
-# [[bin]]
-# name = "day20"
-# path = "src/day20.rs"
+[[bin]]
+name = "day20"
+path = "src/day20.rs"
 
-# [[bin]]
-# name = "day21"
-# path = "src/day21.rs"
+[[bin]]
+name = "day21"
+path = "src/day21.rs"
 
 # [[bin]]
 # name = "day22"
