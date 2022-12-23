@@ -49,21 +49,6 @@ enum Monkey {
 }
 
 impl Monkey {
-    /// Returns `true` if the monkey is [`Literal`].
-    ///
-    /// [`Literal`]: Monkey::Literal
-    #[must_use]
-    fn is_literal(&self) -> bool {
-        matches!(self, Self::Literal(..))
-    }
-
-    fn as_literal(&self) -> Option<&i128> {
-        if let Self::Literal(v) = self {
-            Some(v)
-        } else {
-            None
-        }
-    }
 
     fn as_monkey_ref(&self) -> Option<&String> {
         if let Self::Ref(v) = self {
@@ -71,22 +56,6 @@ impl Monkey {
         } else {
             None
         }
-    }
-
-    /// Returns `true` if the monkey is [`Ref`].
-    ///
-    /// [`Ref`]: Monkey::Ref
-    #[must_use]
-    fn is_ref(&self) -> bool {
-        matches!(self, Self::Ref(..))
-    }
-
-    /// Returns `true` if the monkey is [`Op`].
-    ///
-    /// [`Op`]: Monkey::Op
-    #[must_use]
-    fn is_op(&self) -> bool {
-        matches!(self, Self::Op(..))
     }
 }
 
@@ -269,13 +238,12 @@ fn part2() {
             let result = problem.eval(val);
 
             let cmp = if let Some(result) = result {
-                result.cmp(&target)
-            } else {
-                if reversed {
-                    Less
+                result.cmp(target)
+            } else if reversed {
+                Less
                 } else {
                     Greater
-                }
+
             };
 
             match cmp {
@@ -304,11 +272,11 @@ fn part2() {
         let mut shift = 0;
         loop
         {
-            if let Some(target) = problem.strict_div_eval(val+shift) {
+            if Some(*target) == problem.strict_div_eval(val+shift) {
                 println!("Part 2: {}", val+shift);
                 break;
             }
-            if let Some(target) = problem.strict_div_eval(val-shift) {
+            if Some(*target) == problem.strict_div_eval(val-shift) {
                 println!("Part 2: {}", val-shift);
                 break
             }
