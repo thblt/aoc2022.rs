@@ -49,7 +49,6 @@ enum Monkey {
 }
 
 impl Monkey {
-
     fn as_monkey_ref(&self) -> Option<&String> {
         if let Self::Ref(v) = self {
             Some(v)
@@ -155,7 +154,9 @@ impl Expression {
         match self {
             Expression::Literal(n) => Some(*n),
             Expression::Operation { op, lhs, rhs } => {
-                if let (Some(lhs), Some(rhs)) = (lhs.strict_div_eval(human), rhs.strict_div_eval(human)) {
+                if let (Some(lhs), Some(rhs)) =
+                    (lhs.strict_div_eval(human), rhs.strict_div_eval(human))
+                {
                     match op {
                         Op::Add => lhs.checked_add(rhs),
                         Op::Sub => lhs.checked_sub(rhs),
@@ -211,9 +212,6 @@ fn part2() {
     if let Monkey::Op(_, left, right) = &monkeys["root"] {
         let left = Expression::new(&monkeys, left.as_monkey_ref().unwrap());
         let right = Expression::new(&monkeys, right.as_monkey_ref().unwrap());
-
-        // println!("{left}");
-        println!("{right}");
 
         let target;
         let problem;
