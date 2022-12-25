@@ -64,8 +64,8 @@ impl<T: Copy> Matrix<T> {
         let width = vecs[0].len();
         let height = vecs.len();
         let mut ret = Self::new_default(width, height, vecs[0][0]);
-        for y in 0..width {
-            for x in 0..height {
+        for y in 0..height {
+            for x in 0..width {
                 ret[(x as isize, y as isize)] = vecs[y][x]
             }
         }
