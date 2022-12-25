@@ -239,9 +239,8 @@ fn part2() {
                 result.cmp(target)
             } else if reversed {
                 Less
-                } else {
-                    Greater
-
+            } else {
+                Greater
             };
 
             match cmp {
@@ -266,17 +265,15 @@ fn part2() {
         }
 
         // We may be slightly off, because of division rounding.
-
         let mut shift = 0;
-        loop
-        {
-            if Some(*target) == problem.strict_div_eval(val+shift) {
-                println!("Part 2: {}", val+shift);
+        loop {
+            if Some(*target) == problem.strict_div_eval(val + shift) {
+                println!("Part 2: {}", val + shift);
                 break;
             }
-            if Some(*target) == problem.strict_div_eval(val-shift) {
-                println!("Part 2: {}", val-shift);
-                break
+            if Some(*target) == problem.strict_div_eval(val - shift) {
+                println!("Part 2: {}", val - shift);
+                break;
             }
             shift += 1;
         }
